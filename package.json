@@ -50,8 +50,8 @@
     "jest": "^25.5.1",
     "rollup": "^2.1.0",
     "rollup-plugin-babel": "^4.4.0",
-    "vue": "^2.6.11",
+    "vue": "^3.1.0",
     "vue-jest": "^3.0.5",
-    "vue-template-compiler": "^2.6.11"
+    "@vue/compiler-sfc": "^3.1.0"
   }
 }

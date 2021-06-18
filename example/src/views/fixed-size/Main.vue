@@ -23,12 +23,14 @@
 </template>
 
 <script>
+
 import Item from './Item'
 import Code from './Code'
 
 import { Random } from '../../common/mock'
 import genUniqueId from '../../common/gen-unique-id'
 import { TAB_TYPE, DEFAULT_TAB } from '../../common/const'
+import {shallowRef} from 'vue';
 
 const TOTAL_COUNT = 10000
 
@@ -54,7 +56,7 @@ export default {
     return {
       total: TOTAL_COUNT.toLocaleString(),
       items: DataItems,
-      itemComponent: Item,
+      itemComponent: shallowRef(Item),
       isShowView: DEFAULT_TAB === TAB_TYPE.VIEW
     }
   },

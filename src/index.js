@@ -2,7 +2,7 @@
  * virtual list default component
  */
 
-import Vue from 'vue'
+import { defineComponent, h } from 'vue'
 import Virtual from './virtual'
 import { Item, Slot } from './item'
 import { VirtualProps } from './props'
@@ -16,7 +16,8 @@ const SLOT_TYPE = {
   FOOTER: 'tfoot'
 }
 
-const VirtualList = Vue.component('virtual-list', {
+const VirtualList = defineComponent({
+  name: 'virtual-list',
   props: VirtualProps,
 
   data () {
@@ -52,11 +53,11 @@ const VirtualList = Vue.component('virtual-list', {
     this.installVirtual()
 
     // listen item size change
-    this.$on(EVENT_TYPE.ITEM, this.onItemResized)
+    // this.$on(EVENT_TYPE.ITEM, this.onItemResized)
 
     // listen slot size change
     if (this.$slots.header || this.$slots.footer) {
-      this.$on(EVENT_TYPE.SLOT, this.onSlotResized)
+      // this.$on(EVENT_TYPE.SLOT, this.onSlotResized)
     }
   },
 
@@ -267,7 +268,7 @@ const VirtualList = Vue.component('virtual-list', {
     // get the real render slots based on range data
     // in-place patch strategy will try to reuse components as possible
     // so those components that are reused will not trigger lifecycle mounted
-    getRenderSlots (h) {
+    getRenderSlots () {
       const slots = []
       const { start, end } = this.range
       const { dataSources, dataKey, itemClass, itemTag, itemStyle, isHorizontal, extraProps, dataComponent, itemScopedSlots } = this
@@ -277,17 +278,15 @@ const VirtualList = Vue.component('virtual-list', {
           const uniqueKey = typeof dataKey === 'function' ? dataKey(dataSource) : dataSource[dataKey]
           if (typeof uniqueKey === 'string' || typeof uniqueKey === 'number') {
             slots.push(h(Item, {
-              props: {
-                index,
-                tag: itemTag,
-                event: EVENT_TYPE.ITEM,
-                horizontal: isHorizontal,
-                uniqueKey: uniqueKey,
-                source: dataSource,
-                extraProps: extraProps,
-                component: dataComponent,
-                scopedSlots: itemScopedSlots
-              },
+              index,
+              tag: itemTag,
+              event: EVENT_TYPE.ITEM,
+              horizontal: isHorizontal,
+              uniqueKey: uniqueKey,
+              source: dataSource,
+              extraProps: extraProps,
+              component: dataComponent,
+              scopedSlots: itemScopedSlots,
               style: itemStyle,
               class: `${itemClass}${this.itemClassAdd ? ' ' + this.itemClassAdd(index) : ''}`
             }))
@@ -304,48 +303,41 @@ const VirtualList = Vue.component('virtual-list', {
 
   // render function, a closer-to-the-compiler alternative to templates
   // https://vuejs.org/v2/guide/render-function.html#The-Data-Object-In-Depth
-  render (h) {
+  render () {
     const { header, footer } = this.$slots
     const { padFront, padBehind } = this.range
     const { isHorizontal, pageMode, rootTag, wrapTag, wrapClass, wrapStyle, headerTag, headerClass, headerStyle, footerTag, footerClass, footerStyle } = this
+
     const paddingStyle = { padding: isHorizontal ? `0px ${padBehind}px 0px ${padFront}px` : `${padFront}px 0px ${padBehind}px` }
     const wrapperStyle = wrapStyle ? Object.assign({}, wrapStyle, paddingStyle) : paddingStyle
 
     return h(rootTag, {
       ref: 'root',
-      on: {
-        '&scroll': !pageMode && this.onScroll
-      }
+      onScrollPassive: !pageMode && this.onScroll
     }, [
       // header slot
       header ? h(Slot, {
         class: headerClass,
         style: headerStyle,
-        props: {
-          tag: headerTag,
-          event: EVENT_TYPE.SLOT,
-          uniqueKey: SLOT_TYPE.HEADER
-        }
+        tag: headerTag,
+        event: EVENT_TYPE.SLOT,
+        uniqueKey: SLOT_TYPE.HEADER
       }, header) : null,
 
       // main list
       h(wrapTag, {
         class: wrapClass,
-        attrs: {
-          role: 'group'
-        },
+        role: 'group',
         style: wrapperStyle
-      }, this.getRenderSlots(h)),
+      }, this.getRenderSlots()),
 
       // footer slot
       footer ? h(Slot, {
         class: footerClass,
         style: footerStyle,
-        props: {
-          tag: footerTag,
-          event: EVENT_TYPE.SLOT,
-          uniqueKey: SLOT_TYPE.FOOTER
-        }
+        tag: footerTag,
+        event: EVENT_TYPE.SLOT,
+        uniqueKey: SLOT_TYPE.FOOTER
       }, footer) : null,
 
       // an empty element use to scroll to bottom

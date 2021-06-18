@@ -3,7 +3,7 @@
  * we need to know their size change at any time
  */
 
-import Vue from 'vue'
+import { defineComponent, h } from 'vue'
 import { ItemProps, SlotProps } from './props'
 
 const Wrapper = {
@@ -45,45 +45,43 @@ const Wrapper = {
 }
 
 // wrapping for item
-export const Item = Vue.component('virtual-list-item', {
+export const Item = defineComponent({
+  name: 'virtual-list-item',
   mixins: [Wrapper],
 
   props: ItemProps,
 
-  render (h) {
-    const { tag, component, extraProps = {}, index, source, scopedSlots = {}, uniqueKey } = this;
+  render () {
+    const { tag, component, extraProps = {}, index, source, scopedSlots = {}, uniqueKey } = this
     const props = {
-        ...extraProps,
-        source,
-        index,
-    };
+      ...extraProps,
+      source,
+      index
+    }
 
     return h(tag, {
       key: uniqueKey,
-      attrs: {
-        role: 'listitem'
-      }
+      role: 'listitem'
     }, [h(component, {
-      props,
+      ...props,
       scopedSlots: scopedSlots
     })])
   }
 })
 
 // wrapping for slot
-export const Slot = Vue.component('virtual-list-slot', {
+export const Slot = defineComponent({
+  name: 'virtual-list-slot',
   mixins: [Wrapper],
 
   props: SlotProps,
 
-  render (h) {
+  render () {
     const { tag, uniqueKey } = this
 
     return h(tag, {
       key: uniqueKey,
-      attrs: {
-        role: uniqueKey
-      }
+      role: uniqueKey
     }, this.$slots.default)
   }
 })
